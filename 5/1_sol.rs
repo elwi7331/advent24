@@ -10,10 +10,11 @@ fn main() {
     }
     .into_iter();
 
-    let mut rules: Vec<(u32, u32)> = Vec::new();
+    let mut rules: Vec<(u32, u32)> = Vec::new(); //[(x, y)]
 
-    while let Some(Ok(line)) = lines.next()
+    while let Some(Ok(line)) = lines.next() // parse rules
         && !line.is_empty()
+    // rules end with empty line
     {
         if let [x, y] = line
             .split('|')
@@ -29,21 +30,23 @@ fn main() {
     let mut result = 0;
 
     while let Some(Ok(line)) = lines.next() {
+        // for each update
         let line: Vec<u32> = line
             .split(',')
             .map(|i| i.parse::<u32>().expect("Could not parse u32 in update"))
             .collect();
 
-        let mut visited = HashMap::new();
+        let mut visited = HashMap::new(); // index for each page/u32
         for (i, y) in line.iter().enumerate() {
             visited.insert(y, i);
         }
 
         let mut correct = true;
         for (x, y) in rules.iter() {
-            if let Some(x_idx) = visited.get(x)
+            if let Some(x_idx) = visited.get(x) // both x and y are in update
                 && let Some(y_idx) = visited.get(y)
                 && !(x_idx < y_idx)
+            // order of x and y is incorrect
             {
                 correct = false;
                 break;
@@ -51,6 +54,7 @@ fn main() {
         }
 
         if correct {
+            // middle page of entry
             let middle = line[line.len() / 2];
             result += middle;
         }
