@@ -1,0 +1,8 @@
+hsnf==0.3.16
+numpy==2.3.3
+packaging==25.0
+scipy==1.16.2
+setuptools==80.9.0
+setuptools-scm==9.2.0
+typing_extensions==4.15.0
+wheel==0.45.1
