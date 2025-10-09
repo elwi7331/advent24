@@ -49,41 +49,45 @@ fn try_trio(bits: &mut [Bit], p: &[u8], i: usize) {
             // set last bits
             bits[a_lo..=a_lo + 2].copy_from_slice(&guess);
 
-            let mut a = (Bit::bits_to_int(&guess) as u8) ^ 0b101;
+            let a = (Bit::bits_to_int(&guess) as u8) ^ 0b101;
+
             // it is possible to go too far...
             if a_lo < a as usize {
-                /*
                 if 0 == p[i] ^ 0b110 ^ a {
-                    let ans = Bit::bits_to_int(&bits);
-                    println!("true ans: {}", ans);
+                    if a_lo == 0 {
+                        let ans = Bit::bits_to_int(&bits);
+                        println!("{}", ans);
+                    } else {
+                        try_trio(bits, p, i + 1);
+                    }
                 }
-                */
-                a = 0;
-            }
-            
-            let desired_value = Bit::u3_to_bits(p[i] ^ 0b110 ^ a);
-            let mut lower_bits_copy = [Bit::Unset; 3];
-            lower_bits_copy.copy_from_slice(&bits[a_lo - (a as usize)..=a_lo - (a as usize) + 2]);
+            } else {
+                let desired_value = Bit::u3_to_bits(p[i] ^ 0b110 ^ a);
+                let mut lower_bits_copy = [Bit::Unset; 3];
+                lower_bits_copy
+                    .copy_from_slice(&bits[a_lo - (a as usize)..=a_lo - (a as usize) + 2]);
 
-            // for each bit, if they are either unset or equal to guess,
-            // otherwise, we can not proceed
-            if (lower_bits_copy[0] == Bit::Unset || lower_bits_copy[0] == desired_value[0])
-                && (lower_bits_copy[1] == Bit::Unset || lower_bits_copy[1] == desired_value[1])
-                && (lower_bits_copy[2] == Bit::Unset || lower_bits_copy[2] == desired_value[2])
-            {
-                // set "shifted" bits
-                bits[a_lo - (a as usize)..=a_lo - (a as usize) + 2].copy_from_slice(&desired_value);
+                // for each bit, if they are either unset or equal to guess,
+                // otherwise, we can not proceed
+                if (lower_bits_copy[0] == Bit::Unset || lower_bits_copy[0] == desired_value[0])
+                    && (lower_bits_copy[1] == Bit::Unset || lower_bits_copy[1] == desired_value[1])
+                    && (lower_bits_copy[2] == Bit::Unset || lower_bits_copy[2] == desired_value[2])
+                {
+                    // set "shifted" bits
+                    bits[a_lo - (a as usize)..=a_lo - (a as usize) + 2]
+                        .copy_from_slice(&desired_value);
 
-                if a_lo == 0 {
-                    let ans = Bit::bits_to_int(&bits);
-                    println!("{}", ans);
-                } else {
-                    try_trio(bits, p, i + 1);
+                    if a_lo == 0 {
+                        let ans = Bit::bits_to_int(&bits);
+                        println!("{}", ans);
+                    } else {
+                        try_trio(bits, p, i + 1);
+                    }
+
+                    // reset "shifted" bits
+                    bits[a_lo - (a as usize)..=a_lo - (a as usize) + 2]
+                        .copy_from_slice(&lower_bits_copy);
                 }
-
-                // reset "shifted" bits
-                bits[a_lo - (a as usize)..=a_lo - (a as usize) + 2]
-                    .copy_from_slice(&lower_bits_copy);
             }
 
             // reset last bits
